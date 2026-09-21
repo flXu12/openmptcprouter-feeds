@@ -1,0 +1,51 @@
+#!/bin/sh
+
+# The lite web UI on port 9091 serves the reduced menu set from
+# /usr/share/luci/menu.d-lite. That needs both patches build.sh applies for
+# 6.12/6.17: dispatcher.uc must honour LUCI_MENU_DIR, and the LuCI CGI entry
+# point must set it for this port. Skip everything without them, otherwise the
+# second instance would just serve the full menu and look like it "works".
+grep -q LUCI_MENU_DIR /usr/share/ucode/luci/dispatcher.uc || exit 0
+
+# uhttpd.main keeps its stock 80/443 listeners: the 9090 entry is a NAT rule
+# handled outside this package, and translating it here would break that.
+#
+# The lite instance repeats main's settings explicitly because a fresh config
+# section inherits none of them, and omits the ones main also leaves at their
+# compiled-in default (ubus_prefix, index_page, ...) so both behave alike.
+if [ "$(uci -q get uhttpd.lite.cgi_prefix)" = "" ]; then
+	uci -q batch <<-EOF >/dev/null
+		set uhttpd.lite=uhttpd
+		set uhttpd.lite.home='/www'
+		set uhttpd.lite.rfc1918_filter='1'
+		set uhttpd.lite.max_requests='3'
+		set uhttpd.lite.max_connections='100'
+		set uhttpd.lite.cgi_prefix='/cgi-bin'
+		set uhttpd.lite.script_timeout='240'
+		set uhttpd.lite.network_timeout='240'
+		set uhttpd.lite.http_keepalive='0'
+		set uhttpd.lite.tcp_keepalive='1'
+		add_list uhttpd.lite.listen_http='0.0.0.0:9091'
+		add_list uhttpd.lite.listen_http='[::]:9091'
+		commit uhttpd
+	EOF
+fi
+
+# Mirror of the manually added 9090 -> 80 redirect ("本机远程"), same fields
+# except the ports. The destination port is what selects the instance: 9091 must
+# map to 9091 (the lite listener), not to 80, or the request lands on uhttpd.main
+# and the full menu shows up.
+if [ "$(uci -q show firewall | grep "src_dport='9091'")" = "" ]; then
+	uci -q batch <<-EOF >/dev/null
+		add firewall redirect
+		set firewall.@redirect[-1].name='omr-lite-menu'
+		set firewall.@redirect[-1].target='DNAT'
+		set firewall.@redirect[-1].src='vpn'
+		set firewall.@redirect[-1].src_dport='9091'
+		set firewall.@redirect[-1].dest_ip='192.168.100.1'
+		set firewall.@redirect[-1].dest_port='9091'
+		commit firewall
+	EOF
+fi
+
+exit 0
