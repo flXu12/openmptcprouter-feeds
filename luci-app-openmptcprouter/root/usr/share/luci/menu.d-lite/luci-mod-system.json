@@ -1,16 +1,4 @@
 {
-        "admin/system/system": {
-                "title": "System",
-                "order": 1,
-                "action": {
-                        "type": "view",
-                        "path": "system/system"
-                },
-                "depends": {
-                        "acl": [ "luci-mod-system-config" ]
-                }
-        },
-
         "admin/system/admin": {
                 "title": "Administration",
                 "order": 2,
@@ -85,56 +73,6 @@
                 }
         },
 
-        "admin/system/startup": {
-                "title": "Startup",
-                "order": 45,
-                "action": {
-                        "type": "view",
-                        "path": "system/startup"
-                },
-                "depends": {
-                        "acl": [ "luci-mod-system-init" ]
-                }
-        },
-
-        "admin/system/crontab": {
-                "title": "Scheduled Tasks",
-                "order": 46,
-                "action": {
-                        "type": "view",
-                        "path": "system/crontab"
-                },
-                "depends": {
-                        "acl": [ "luci-mod-system-cron" ]
-                }
-        },
-
-        "admin/system/mounts": {
-                "title": "Mount Points",
-                "order": 50,
-                "action": {
-                        "type": "view",
-                        "path": "system/mounts"
-                },
-                "depends": {
-                        "acl": [ "luci-mod-system-mounts" ],
-                        "fs": { "/sbin/block": "executable" }
-                }
-        },
-
-        "admin/system/leds": {
-                "title": "LED Configuration",
-                "order": 60,
-                "action": {
-                        "type": "view",
-                        "path": "system/leds"
-                },
-                "depends": {
-                        "acl": [ "luci-mod-system-config" ],
-                        "fs": { "/sys/class/leds": "directory" }
-                }
-        },
-
         "admin/system/flash": {
                 "title": "Backup / Flash Firmware",
                 "order": 70,
@@ -144,18 +82,6 @@
                 },
                 "depends": {
                         "acl": [ "luci-mod-system-flash" ]
-                }
-        },
-
-        "admin/system/reboot": {
-                "title": "Reboot",
-                "order": 90,
-                "action": {
-                        "type": "view",
-                        "path": "system/reboot"
-                },
-                "depends": {
-                        "acl": [ "luci-mod-system-reboot" ]
                 }
         }
 }

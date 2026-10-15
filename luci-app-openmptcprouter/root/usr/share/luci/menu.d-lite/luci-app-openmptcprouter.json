@@ -3,11 +3,45 @@
                 "title": "OpenMPTCProuter",
                 "order": 1,
                 "action": {
-                        "type": "template",
-                        "path": "openmptcprouter/wizard"
+                        "type": "firstchild"
                 },
                 "depends": {
                         "acl": [ "luci-app-openmptcprouter" ]
+                }
+        },
+
+        "admin/system/openmptcprouter/wizard": {
+                "title": "Settings Wizard",
+                "order": 1,
+                "action": {
+                        "type": "template",
+                        "path": "openmptcprouter/wizard"
+                }
+        },
+
+        "admin/system/openmptcprouter/wizard_add": {
+                "action": {
+                        "type": "call",
+                        "module": "luci.controller.openmptcprouter",
+                        "function": "wizard_add",
+                        "post": true
+                }
+        },
+
+        "admin/system/openmptcprouter/status": {
+                "title": "Status",
+                "order": 2,
+                "action": {
+                        "type": "template",
+                        "path": "openmptcprouter/wanstatus"
+                }
+        },
+
+        "admin/system/openmptcprouter/interfaces_status": {
+                "action": {
+                        "type": "call",
+                        "module": "luci.controller.openmptcprouter",
+                        "function": "interfaces_status"
                 }
         }
 }
